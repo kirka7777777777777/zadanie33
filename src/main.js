@@ -391,19 +391,26 @@ Vue.component('app', {
                 id: this.nextTaskId++,
                 createdDate: new Date().toLocaleString(),
                 lastEditedDate: null,
-                status: 'planned'
+                status: 'planned',
+                isOverdue: this.isTaskOverdue(taskData.deadline)
             };
             this.tasks.push(newTask);
             this.saveTasks();
+        },
+        isTaskOverdue(deadline) {
+            const now = new Date();
+            return new Date(deadline) < now;
         },
         editTask(taskId, updatedTaskData) {
             const task = this.tasks.find(task => task.id === taskId);
             if (task) {
                 Object.assign(task, updatedTaskData);
                 task.lastEditedDate = new Date().toLocaleString();
+                task.isOverdue = this.isTaskOverdue(updatedTaskData.deadline); // Проверка на просроченность
                 this.saveTasks();
             }
         },
+
         deleteTask(taskId) {
             this.tasks = this.tasks.filter(task => task.id !== taskId);
             this.saveTasks();
@@ -412,6 +419,7 @@ Vue.component('app', {
             const task = this.tasks.find(task => task.id === taskId);
             if (task) {
                 task.status = newStatus;
+                task.isOverdue = this.isTaskOverdue(task.deadline); // Проверка на просроченность
                 this.saveTasks();
             }
         },
@@ -533,18 +541,15 @@ Vue.component('kanban-column', {
     }
 });
 
-
 Vue.component('task-card', {
     template: `
-    <div class="task-card">
+    <div :class="['task-card', task.status, { overdue: task.isOverdue }]">
       <h3>{{ task.title }}</h3>
       <p>{{ task.description }}</p>
       <p>Created: {{ task.createdDate }}</p>
       <p v-if="task.lastEditedDate">Last Edited: {{ task.lastEditedDate }}</p>
       <p>Deadline: {{ task.deadline }}</p>
       <p v-if="task.completedDate">Completed: {{ task.completedDate }}</p>
-      <p v-if="task.isOverdue" class="overdue">Expired</p>
-      <p v-else-if="task.status === 'completed'">Completed in time</p>
       <p v-if="task.returnReason">Return Reason: {{ task.returnReason }}</p>
       
       <button v-if="canEdit" @click="showEditForm = true">Edit</button>

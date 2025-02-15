@@ -54,3 +54,33 @@ form {
     flex-direction: column;
     align-items: center;
 }
+.task-card {
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    transition: transform 0.2s;
+}
+
+.task-card:hover {
+    transform: scale(1.02);
+}
+
+.task-card.planned {
+    background-color: #e3dfdf;
+}
+
+.task-card.inProgress {
+    background-color: #cbd7e1; /
+}
+
+.task-card.testing {
+    background-color: #d0e0e4;
+}
+
+.task-card.completed {
+    background-color: #d5e0ec;
+}
+
+.task-card.overdue {
+    background-color: #e6d0ce;
+}
